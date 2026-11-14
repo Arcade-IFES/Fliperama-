@@ -2,7 +2,7 @@
 
 ## Documentação
 
-O [Guia Spec-Kit + Caveman do Grupo](docs/referencia/spec-kit-caveman.md) reúne os exercícios 1 e 2 da Aula 12 sobre o registro de partidas sem identificação.
+O [Guia Spec-Kit + Caveman do Grupo](docs/referencia/spec-kit-caveman.md) reúne os exercícios 1 a 5 da Aula 12, as regras de revisão do grupo e a aplicação prática na issue #18.
 
 Para abrir a documentação MkDocs, execute na raiz do repositório:
 

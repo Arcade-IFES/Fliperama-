@@ -89,6 +89,7 @@ function App() {
     return (
       <Jogos
         onSelecionarJogo={SelecionarJogo}
+        onVoltarInicio={voltarInicio}
       />
   )}
 

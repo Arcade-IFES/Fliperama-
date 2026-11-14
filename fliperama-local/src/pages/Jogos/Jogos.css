@@ -57,6 +57,54 @@
   align-items: stretch;
 }
 
+.jogos-erro {
+  margin-top: 48px;
+  width: min(720px, 100%);
+  padding: 36px 32px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 28px;
+
+  box-sizing: border-box;
+  border: 2px solid #ff8383;
+  background: #090918;
+  text-align: center;
+}
+
+.jogos-erro-mensagem {
+  margin: 0;
+  color: #ffffff;
+  font-size: clamp(20px, 2.5vw, 28px);
+  font-weight: bold;
+  line-height: 1.5;
+}
+
+.jogos-tentar-novamente {
+  padding: 16px 30px;
+
+  border: 2px solid #ffe600;
+  background: #ffe600;
+  color: #050510;
+
+  font-family: 'Courier New', monospace;
+  font-size: 20px;
+  font-weight: bold;
+  letter-spacing: 2px;
+
+  cursor: pointer;
+
+  box-shadow:
+    0 0 10px #ffe600,
+    0 0 20px rgba(255, 230, 0, 0.5);
+}
+
+.jogos-tentar-novamente:focus-visible {
+  outline: 4px solid #ffffff;
+  outline-offset: 5px;
+}
+
 .jogos-instrucao {
   margin-top: 35px;
 
