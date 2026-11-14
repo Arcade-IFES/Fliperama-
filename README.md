@@ -1,5 +1,16 @@
 # Fliperama local — Recreio Arcade (G3)
 
+## Documentação
+
+O [Guia Spec-Kit + Caveman do Grupo](docs/referencia/spec-kit-caveman.md) reúne os exercícios 1 e 2 da Aula 12 sobre o registro de partidas sem identificação.
+
+Para abrir a documentação MkDocs, execute na raiz do repositório:
+
+```sh
+python -m pip install "mkdocs==1.6.1"
+python -m mkdocs serve
+```
+
 ## Rodar no computador
 
 Na pasta `fliperama-local`, execute `npm ci`. Em dois terminais, rode `npm run server` (API local na porta 3000) e `npm run dev` (telas na porta 5173). O servidor baixa os jogos dos repositórios configurados em `server/services/sincronizacaoService.ts` e guarda o catálogo em `fliperama-local/data/`.
