@@ -1,0 +1,16 @@
+site_name: Fliperama Local — Recreio Arcade (G3)
+repo_url: https://github.com/nribjoaovictor/Fliperama-
+theme:
+  name: mkdocs
+  locale: pt_BR
+nav:
+  - Início: index.md
+  - Ambiente de demonstração: ambiente-demo.md
+  - Planejamento:
+      - Backlog: planejamento/backlog.md
+      - Funcionalidades fim a fim: planejamento/features-fim-a-fim.md
+      - Arquitetura: planejamento/arquitetura.md
+      - Matriz de dependências: planejamento/dsm.md
+  - Desenvolvimento:
+      - Spec-Kit: referencia/spec-kit.md
+      - Guia Spec-Kit + Caveman do Grupo: referencia/spec-kit-caveman.md
