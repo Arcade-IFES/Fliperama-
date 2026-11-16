@@ -1,89 +1,139 @@
-import { useState, useEffect } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import GameCard from '../../components/GameCard/GameCard'
 import { buscarJogos } from '../../service/apiLocal'
 import './Jogos.css'
 import type { Jogo } from '../../types/Jogo'
+import { JogosErro } from './JogosErro'
+import {
+  INSTRUCAO_CATALOGO_ERRO,
+  INSTRUCAO_CATALOGO_PADRAO,
+  carregarCatalogoJogos,
+  processarTeclaCatalogo,
+} from './catalogoJogos'
 
 type JogosProps = {
-    onSelecionarJogo: (jogo: Jogo) => void
+  onSelecionarJogo: (jogo: Jogo) => void
+  onVoltarInicio?: () => void
 }
 
-
-
-function Jogos({ onSelecionarJogo }: JogosProps) {
+function Jogos({ onSelecionarJogo, onVoltarInicio }: JogosProps) {
   const [jogoSelecionado, setJogoSelecionado] = useState(0)
   const [jogos, setJogos] = useState<Jogo[]>([])
-    useEffect(() => {
-        async function carregarJogos() {
-            try {
-            const jogosRecebidos = await buscarJogos()
-            setJogos(jogosRecebidos)
-            } catch (erro) {
-            console.error('Erro ao carregar jogos:', erro)
-            }
-        }
+  const [erro, setErro] = useState<string | null>(null)
+  const tentandoRef = useRef(false)
 
-        carregarJogos()
-    }, [])
+  const aplicarResultado = useCallback(
+    (resultado: { jogos: Jogo[]; erro: string | null }) => {
+      setJogos(resultado.jogos)
+      setErro(resultado.erro)
+      if (resultado.erro === null) {
+        setJogoSelecionado(0)
+      }
+    },
+    [],
+  )
 
-    useEffect(() => {
-        function aoPressionarTecla(event: KeyboardEvent) {
-            if (jogos.length === 0) {
-                return
-            }
+  const tentarNovamente = useCallback(async () => {
+    if (tentandoRef.current) {
+      return
+    }
+    tentandoRef.current = true
+    try {
+      const resultado = await carregarCatalogoJogos(buscarJogos)
+      aplicarResultado(resultado)
+    } finally {
+      tentandoRef.current = false
+    }
+  }, [aplicarResultado])
 
-            if (event.key === 'ArrowRight') {
-                setJogoSelecionado((atual) =>
-                atual < jogos.length - 1 ? atual + 1 : 0
-                )
-            }
+  useEffect(() => {
+    let ativo = true
 
-            if (event.key === 'ArrowLeft') {
-                setJogoSelecionado((atual) =>
-                atual > 0 ? atual - 1 : jogos.length - 1
-                )
-            }
-            
-            if (event.key === 'Enter') {
-                const jogo = jogos[jogoSelecionado]
+    async function carregarInicial() {
+      const resultado = await carregarCatalogoJogos(buscarJogos)
+      if (ativo) {
+        aplicarResultado(resultado)
+      }
+    }
 
-                if (jogo) {
-                    onSelecionarJogo(jogo)
-                }
-            }
-        }
+    void carregarInicial()
 
-        window.addEventListener('keydown', aoPressionarTecla)
+    return () => {
+      ativo = false
+    }
+  }, [aplicarResultado])
 
-        return () => {
-        window.removeEventListener('keydown', aoPressionarTecla)
-        }
-    }, [jogos, jogoSelecionado, onSelecionarJogo])
+  useEffect(() => {
+    function aoPressionarTecla(event: KeyboardEvent) {
+      const acao = processarTeclaCatalogo(
+        event.key,
+        jogos,
+        jogoSelecionado,
+        erro,
+      )
 
-    
+      if (acao.tipo === 'voltar_inicio') {
+        onVoltarInicio?.()
+        return
+      }
 
-    return (
-        <main className="jogos-screen">
+      if (acao.tipo === 'tentar_novamente') {
+        event.preventDefault()
+        void tentarNovamente()
+        return
+      }
 
-            <h1>SELEÇÃO DE JOGOS</h1>
+      if (acao.tipo === 'selecionar_indice') {
+        setJogoSelecionado(acao.indice)
+        return
+      }
 
-            <section className="jogos-grid">
-            {jogos.map((jogo, index) => (
-                <GameCard
-                key={jogo.id}
-                nome={jogo.nome}
-                autores={jogo.autores}
-                selecionado={index === jogoSelecionado}
-                />
-            ))}
-            </section>
+      if (acao.tipo === 'iniciar_jogo') {
+        onSelecionarJogo(acao.jogo)
+      }
+    }
 
-            <p className="jogos-instrucao">
-            ← → SELECIONAR • ENTER JOGAR
-            </p>
+    window.addEventListener('keydown', aoPressionarTecla)
 
-        </main>
-    )
+    return () => {
+      window.removeEventListener('keydown', aoPressionarTecla)
+    }
+  }, [
+    erro,
+    jogos,
+    jogoSelecionado,
+    onSelecionarJogo,
+    onVoltarInicio,
+    tentarNovamente,
+  ])
+
+  return (
+    <main className="jogos-screen">
+      <h1>SELEÇÃO DE JOGOS</h1>
+
+      {erro !== null ? (
+        <JogosErro
+          mensagem={erro}
+          onTentarNovamente={() => void tentarNovamente()}
+        />
+      ) : (
+        <section className="jogos-grid">
+          {jogos.map((jogo, index) => (
+            <GameCard
+              key={jogo.id}
+              nome={jogo.nome}
+              autores={jogo.autores}
+              selecionado={index === jogoSelecionado}
+            />
+          ))}
+        </section>
+      )}
+
+      <p className="jogos-instrucao">
+        {erro !== null ? INSTRUCAO_CATALOGO_ERRO : INSTRUCAO_CATALOGO_PADRAO}
+      </p>
+    </main>
+  )
 }
 
 export default Jogos
